@@ -10,9 +10,54 @@ Google GCR: gcr.io/proyecto-id/mi-imagen:v1
 Azure ACR: mi-registro.azurecr.io/mi-imagen:v1
 Quay.io: quay.io/mi-usuario/mi-imagen:v1
 
+
+********Copiar archivos de Host al contenedor********
+
+donde se especifica cp archivo contenedor:ruta_dentro_del_contenedor
+
+docker cp index.html apache:/usr/local/apache2/htdocs/
+
+
 ********Docker Volumes********
 
+La manera de persistir los datos de un contenedor es a travez de un volume que se replica en la maquina host
 -v
+ejemplos:
+docker run -v nombre-volume:/var/lib/mysql mysql:5.7
+
+docker run -v /home/usuario/nombre-volume:/var/lib/mysql mysql:5.7
+
+docker run -v $PWD/nombre-volume:/var/lib/mysql mysql:5.7
+
+docker run -d --it --name test-container -v "bootVolume":/tmp ubuntu:xenial
+
+Para ver el espacio de alacenamiendo en disco de cada volume, imagen y contenedor:
+docker system df -v
+Para obtener un resumen menos detallado puedes usar:
+docker system df       
+
+Para obtener el uso de memoria RAM de cada contenedor y otros datos:
+docker stats
+
+Listar volumes:
+docker volume ls
+
+Borrar volume:
+docker volume rm nombre-volume
+
+Para modificar los permisos dentro del contenedor y estos se repliquen al host por que es un enlace directo seria de esta manera:
+docker volume create my-volume
+docker run -v my-volume:/app busybox sh -c "chown 1000:1000 /app && chmod 755 /app"
+
+Tambien se pueden modificar los permisos antes de pasarle el volume al contenedor pero esto no es tan recomendable si se desea automatizar el proceso, pero tendria el mismo resultado, solo tendriamos que acceder directamente al sistema de archivos del host donde Docker almacena los volúmenes y modificar el propietario y los permisos en el directorio _data ya que este es el directorio real donde se almacenaran los datos en el volume:
+sudo chown 1000:1000 /var/lib/docker/volumes/my-volume/_data
+sudo chmod 755 /var/lib/docker/volumes/my-volume/_data
+
+Puedes montar un volumen como solo lectura usando la opción :ro.
+docker run -v my-volume:/app/data:ro my-image
+
+La ruta por defecto de los volumes en docker es /var/lib/docker/volumes/nombre-volume/_data
+
 
 ********Formato de puertos********
 
