@@ -1,5 +1,5 @@
 <!-- 
-********Imagenes en Docker********
+************************Imagenes en Docker********************************
 
 La forma de nombrar a las imagenes de docker es <nombre>:<tag> 
 Si no se especifica un tag para la imagen, docker usa latest para indicar que use la ultima version. ejemplo  node:latest
@@ -11,14 +11,19 @@ Azure ACR: mi-registro.azurecr.io/mi-imagen:v1
 Quay.io: quay.io/mi-usuario/mi-imagen:v1
 
 
-********Copiar archivos de Host al contenedor********
+************************Imagenes en Docker********************************
+
+
+
+
+****************Copiar archivos de Host al contenedor************************
 
 donde se especifica cp archivo contenedor:ruta_dentro_del_contenedor
 
 docker cp index.html apache:/usr/local/apache2/htdocs/
 
 
-********Docker Volumes********
+********************************Docker Volumes********************************
 
 La manera de persistir los datos de un contenedor es a travez de un volume que se replica en la maquina host
 -v
@@ -35,6 +40,15 @@ Para ver el espacio de alacenamiendo en disco de cada volume, imagen y contenedo
 docker system df -v
 Para obtener un resumen menos detallado puedes usar:
 docker system df       
+
+Para limitar el uso de memoria RAM de un contenedor usamos -m "mb"
+
+docker run -d -m 512m --memory-swap 1g --name my_container my_image
+
+En este ejemplo:
+    -m 512m: Limita la memoria RAM a 512 MB.
+    --memory-swap 1g: Limita la memoria total (RAM + swap) a 1 GB.
+
 
 Para obtener el uso de memoria RAM de cada contenedor y otros datos:
 docker stats
@@ -59,13 +73,71 @@ docker run -v my-volume:/app/data:ro my-image
 La ruta por defecto de los volumes en docker es /var/lib/docker/volumes/nombre-volume/_data
 
 
-********Formato de puertos********
+************************Formato de puertos****************************************
 
 puerto_host:puerto_container 
        3305:3306
 
 
-********Comandos en Docker********
+************************Tipos de Redes en Docker**********************************
+
+Bridge (puente):
+
+    Es el tipo de red predeterminado. Los contenedores en una red bridge pueden comunicarse entre sí utilizando IP internas.
+    Se utiliza principalmente para la comunicación entre contenedores en un mismo host.
+
+Host:
+
+    El contenedor comparte la pila de red del host.
+    No hay aislamiento de red entre el contenedor y el host.
+
+None:
+
+    El contenedor no tiene acceso a la red.
+    Se utiliza cuando se desea un aislamiento total del contenedor.
+
+Overlay:
+
+    Permite la comunicación entre contenedores que se ejecutan en diferentes hosts Docker.
+    Se utiliza principalmente en configuraciones de Docker Swarm.
+
+Macvlan:
+
+    Asigna una dirección MAC a cada contenedor para que parezcan dispositivos físicos en la red.
+    Permite la integración directa con una red física.
+
+Network plugins:
+
+    Permite la integración con soluciones de redes de terceros.
+
+-----Crear y Gestionar Redes-----
+
+crear una red:
+docker network create my_bridge_network
+
+listar redes:
+docker network ls
+
+Para obtener detalles sobre una red específica:
+docker newtwork inspect my_bridge_network
+
+Para conectar un contenedor a una red específica al iniciarlo, utiliza la opción --network:
+docker run -d --name my_container --network my_bridge_network my_image
+
+Si el contenedor ya está en ejecución, puedes conectarlo a una red utilizando:
+docker network connect my_bridge_network my_container
+
+Para desconectar un contenedor de una red específica:
+docker network disconnect my_bridge_network my_container
+
+
+************************Docker Compose**********************************
+
+Docker Compose simplifica el despliegue y la gestión de aplicaciones de contenedores que constan de múltiples servicios, permitiendo una configuración clara y unificada a través de un archivo YAML.
+
+
+
+************************Comandos en Docker****************************************
 docker
 ├── build
 │   ├── -f, --file       # Especifica el Dockerfile
@@ -108,7 +180,9 @@ docker
 │
 ├── rm
 │   ├── -f, --force      # Forza la eliminación de un contenedor en ejecución
-│   └── -v, --volumes    # Elimina los volúmenes asociados al contenedor
+│   ├── -v, --volumes    # Elimina los volúmenes asociados al contenedor
+│   └── docker rm -f $(docker ps -aq)   #para borrar todos los contenedores
+│
 │
 ├── rmi
 │   └── -f, --force      # Forza la eliminación de una imagen

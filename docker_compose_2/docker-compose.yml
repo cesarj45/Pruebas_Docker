@@ -1,0 +1,13 @@
+version: '3'
+
+services: 
+  web:
+    container_name: mysql_prueba
+    ports: 
+      - "8087:3306"
+    image: mysql:5.7
+    environment:
+      - "MYSQL_ROOT_PASSWORD=12345678"
+      - "MYSQL_DATABASE=docker_db"
+      - "MYSQL_USER=docker_user"
+      - "MYSQL_PASSWORD=123456"
